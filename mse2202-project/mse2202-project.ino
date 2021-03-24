@@ -3,9 +3,11 @@ const int buttonPin = 27;
 const int potiPin = 32;
 const int currentSensorPin = A5;
 
-/* Motor Pins */
+/* Motor Pins and Channels */
 const int climbMotorFPin = 15;
 const int climbMotorRPin = 2;
+const int climbMotorFChannel = 1;
+const int climbMotorRChannel = 2;
 
 /* Sensor State/Time Variables */
 int button = 1;
@@ -31,8 +33,8 @@ void setup() {
    pinMode(currentSensorPin, INPUT); // Current sensor
   
    // ledc (LED Control) pins setup, used as PWMs for motors
-   ledcAttachPin(climbMotorFPin, 1); // F means forward
-   ledcAttachPin(climbMotorRPin, 2); // R means reverse
+   ledcAttachPin(climbMotorFPin, climbMotorFChannel); // F means forward
+   ledcAttachPin(climbMotorRPin, climbMotorRChannel); // R means reverse
    ledcSetup(1, 20000, 8);
    ledcSetup(2, 20000, 8);
 
@@ -59,11 +61,11 @@ void loop() {
   } 
 
   if (motorOn) {
-    ledcWrite(1, motorSpeed);
-    ledcWrite(2, 0);
+    ledcWrite(climbMotorFChannel, motorSpeed);
+    ledcWrite(climbMotorRChannel, 0);
   } else {
-    ledcWrite(1, 0);
-    ledcWrite(2, 0);
+    ledcWrite(climbMotorFChannel, 0);
+    ledcWrite(climbMotorRChannel, 0);
   }
 
   buttonLast = button;
