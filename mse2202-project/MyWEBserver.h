@@ -4,12 +4,10 @@
 
   \WEB server code
 
-
 */
 
 #ifndef MYWEBSERVER_H
 #define MYWEBSERVER_H 1
-
 
 #include "BreakPointWEBPage.h"
 #include <ESPAsyncWebServer.h>
@@ -18,10 +16,9 @@
 
 void WSVR_ButtonResponse(void);
 
-
 // Replace with your network credentials
 const char *ssid = "BaseC2";
-const char *password = "12345678";  //must be 8 characters long
+const char *password = "12345678"; //must be 8 characters long
 
 uint8_t u8WSVR_WEBSocketID;
 
@@ -31,8 +28,6 @@ IPAddress subnet(255, 255, 255, 0);
 
 AsyncWebServer server(80);
 WebSocketsServer webSocket(81);
-
-
 
 boolean bWSVR_DebugOfOff = false;
 boolean bWSVR_HaltContinuous = false;
@@ -47,13 +42,13 @@ String strWSVR_ButtonState = "0";
 String strWSVR_VariableNames;
 String strWSVR_VariableData;
 
-void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght)
+void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t lenght)
 { // When a WebSocket message is received
 
   u8WSVR_WEBSocketID = num;
   switch (type)
   {
-    case WStype_DISCONNECTED:             // if the websocket is disconnected
+    case WStype_DISCONNECTED: // if the websocket is disconnected
       {
         Serial.printf("[%u] Disconnected!\n", num);
         ucWSVR_WEBSocketConnected = 0;
@@ -67,9 +62,8 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
         break;
       }
 
-    case WStype_TEXT:                     // if new text data is received
+    case WStype_TEXT: // if new text data is received
       {
-
 
         switch (payload[0])
         {
@@ -89,7 +83,6 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
               webSocket.sendTXT(u8WSVR_WEBSocketID, strWSVR_VariableNames);
               break;
             }
-
         }
         break;
       }
@@ -111,12 +104,10 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
   }
 }
 
-
 void WSVR_setupWEbServer(void)
 {
 
   Serial.print(F("Configuring access point..."));
-
 
   Serial.print(F("Connecting to "));
   Serial.println(ssid);
@@ -127,24 +118,17 @@ void WSVR_setupWEbServer(void)
   WiFi.softAPConfig(local_ip, gateway, subnet);
   delay(1000);
 
-
   IPAddress myIP = WiFi.softAPIP();
   Serial.print(F("AP IP address: "));
   Serial.println(myIP);
 
-
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest * request)
-  {
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(200, "text/html", BreakPoint_page);
-
   });
 
-
-
-  webSocket.begin();                          // start the websocket server
+  webSocket.begin(); // start the websocket server
   webSocket.onEvent(webSocketEvent);
   Serial.println("WebSocket server started.");
-
 
   server.begin();
   Serial.println(F("HTTP server started"));
@@ -155,14 +139,12 @@ void WSVR_setupWEbServer(void)
   Serial.println(F(""));
 }
 
-
 void WSVR_SendMsg(String strText)
 {
   if (ucWSVR_WEBSocketConnected)
   {
     webSocket.sendTXT(u8WSVR_WEBSocketID, strText);
   }
-
 }
 
 void WSVR_ButtonResponse(void)
@@ -202,7 +184,7 @@ void WSVR_ButtonResponse(void)
         break;
       }
 
-    case 't':  //continue from BP halt
+    case 't': //continue from BP halt
       {
         Serial.println("UnHalt");
         bWSVR_Halted = false;
@@ -216,7 +198,6 @@ void WSVR_ButtonResponse(void)
 
         strWSVR_ButtonState = "";
 
-
         break;
       }
     case 's':
@@ -225,11 +206,7 @@ void WSVR_ButtonResponse(void)
         strWSVR_ButtonState = "";
         break;
       }
-
-
-
   }
-
 }
 
 #endif

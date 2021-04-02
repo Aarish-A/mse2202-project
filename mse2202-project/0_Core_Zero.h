@@ -3,8 +3,6 @@
   2020 06 17
 
   \Core 0 code
-
-
 */
 
 #ifndef CORE_ZERO_H
@@ -17,7 +15,7 @@
 
 TaskHandle_t Core_Zero;
 
-const int CR0_ciMainTimer =  1000;
+const int CR0_ciMainTimer = 1000;
 
 unsigned char CR0_ucMainTimerCaseCore0;
 
@@ -31,29 +29,26 @@ uint32_t CR0_u32Avg;
 unsigned long CR0_ulPreviousMicrosCore0;
 unsigned long CR0_ulCurrentMicrosCore0;
 
-void Core_ZeroCode( void * pvParameters );
-
+void Core_ZeroCode(void *pvParameters);
 
 void Core_ZEROInit()
 {
   xTaskCreatePinnedToCore(
-    Core_ZeroCode,   /* Task function. */
-    "Core_Zero",     /* name of task. */
-    10000,       /* Stack size of task */
-    NULL,        /* parameter of the task */
-    1,           /* priority of the task */
-    &Core_Zero,      /* Task handle to keep track of created task */
-    0);          /* pin task to core 0 */
+    Core_ZeroCode, /* Task function. */
+    "Core_Zero",   /* name of task. */
+    10000,         /* Stack size of task */
+    NULL,          /* parameter of the task */
+    1,             /* priority of the task */
+    &Core_Zero,    /* Task handle to keep track of created task */
+    0);            /* pin task to core 0 */
   delay(500);
 };
 
-
-void Core_ZeroCode( void * pvParameters )
+void Core_ZeroCode(void *pvParameters)
 {
   Serial.print("Core - ");
   Serial.print(xPortGetCoreID());
   Serial.println("   running ");
-
 
   //Core 0 Setup
   //-------------------------------------------------------------------------------------------
@@ -62,7 +57,6 @@ void Core_ZeroCode( void * pvParameters )
   WSVR_setupWEbServer();
 
   delay(1000);
-
 
   WDT_EnableFastWatchDogCore0();
 
@@ -87,7 +81,6 @@ void Core_ZeroCode( void * pvParameters )
   for (;;)
   {
 
-
     CR0_ulCurrentMicrosCore0 = micros();
     if ((CR0_ulCurrentMicrosCore0 - CR0_ulPreviousMicrosCore0) >= CR0_ciMainTimer)
     {
@@ -96,9 +89,7 @@ void Core_ZeroCode( void * pvParameters )
       WDT_ucCaseIndexCore0 = CR0_ucMainTimerCaseCore0;
       vTaskDelay(1);
 
-
       CR0_ulPreviousMicrosCore0 = CR0_ulCurrentMicrosCore0;
-
 
       switch (CR0_ucMainTimerCaseCore0) //full switch run through is 1mS
       {
@@ -124,9 +115,11 @@ void Core_ZeroCode( void * pvParameters )
         //###############################################################################
         case 2: //web page control
           {
-            asm volatile("esync; rsr %0,ccount":"=a" (CR0_u32Last)); // @ 240mHz clock each tick is ~4nS
+            asm volatile("esync; rsr %0,ccount"
+                         : "=a"(CR0_u32Last)); // @ 240mHz clock each tick is ~4nS
             webSocket.loop();
-            asm volatile("esync; rsr %0,ccount":"=a" (CR0_u32Now));
+            asm volatile("esync; rsr %0,ccount"
+                         : "=a"(CR0_u32Now));
 
             CR0_ucMainTimerCaseCore0 = 3;
             break;
@@ -135,12 +128,11 @@ void Core_ZeroCode( void * pvParameters )
         case 3:
           {
 
-
             CR0_ucMainTimerCaseCore0 = 4;
             break;
           }
         //###############################################################################
-        case 4:   ///warning exceed wdt time
+        case 4: ///warning exceed wdt time
           {
             WDT_CheckOperationTime();
             CR0_ucMainTimerCaseCore0 = 5;
@@ -150,14 +142,12 @@ void Core_ZeroCode( void * pvParameters )
         case 5:
           {
 
-
             CR0_ucMainTimerCaseCore0 = 6;
             break;
           }
         //###############################################################################
         case 6:
           {
-
 
             CR0_ucMainTimerCaseCore0 = 7;
             break;
@@ -180,14 +170,11 @@ void Core_ZeroCode( void * pvParameters )
         case 9:
           {
 
-
             CR0_ucMainTimerCaseCore0 = 0;
 
             break;
           }
-
       }
-
     }
   }
 }

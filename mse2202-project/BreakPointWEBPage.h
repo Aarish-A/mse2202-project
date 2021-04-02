@@ -3,8 +3,6 @@
   March 21,2020
 
   \WEB Page code for Break point WEBpage
-
-
 */
 
 #ifndef BREAKPOINTWEBPAGE_H
