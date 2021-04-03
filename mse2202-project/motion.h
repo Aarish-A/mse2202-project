@@ -50,10 +50,10 @@ void setupMotion (void)
   // Initialize channels
   // channels 0-15, resolution 1-16 bits, freq limits depend on resolution
   // ledcSetup(uint8_t channel, uint32_t freq, uint8_t resolution_bits);
-  ledcSetup(1, 20000, 8); // 20mS PWM, 8-bit resolution
-  ledcSetup(2, 20000, 8);
-  ledcSetup(3, 20000, 8);
-  ledcSetup(4, 20000, 8);
+  ledcSetup(1, 2000, 8); // 20mS PWM, 8-bit resolution
+  ledcSetup(2, 2000, 8);
+  ledcSetup(3, 2000, 8);
+  ledcSetup(4, 2000, 8);
 
   ucMotion_Direction = 0;
   ucMotion_Speed = 0;

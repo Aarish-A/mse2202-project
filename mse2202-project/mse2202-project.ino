@@ -102,10 +102,10 @@ void setup()
 void loop()
 {
   curButtonState = digitalRead(ciPB1);
-  
+
   ENC_Averaging(); //average the encoder tick times
-  
-  Serial.printf("Left: %d, Right: %d\n", ENC_vi32LeftOdometer, ENC_vi32RightOdometer);
+
+  //  Serial.printf("Left: %d, Right: %d\n", ENC_vi32LeftOdometer, ENC_vi32RightOdometer);
 
   if (curButtonState == LOW && prevButtonState == HIGH) {
     start = !start;
@@ -115,10 +115,10 @@ void loop()
       stopDrive();
   }
 
-  handleDrive();
 
+  handleDrive();
   delay(1);
-    
+
 
 //  CR1_ulMainTimerNow = micros();
 //  if (CR1_ulMainTimerNow - CR1_ulMainTimerPrevious >= CR1_ciMainTimer)
@@ -132,7 +132,7 @@ void loop()
 //    { //full switch run through is 1mS
 //      case 0:
 //        {
-//
+//          handleDrive();
 //          CR1_ucMainTimerCaseCore1 = 1;
 //          break;
 //        }
