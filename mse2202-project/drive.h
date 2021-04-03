@@ -6,7 +6,7 @@ const int encToRotRatio = 120;
 const int rotToCMRatio = 4.2 * 3.14159;
 
 unsigned long driveStopInterval = 250;
-unsigned long driveStateTime = ULONG_MAX;
+unsigned long driveStateTime = 0;
 
 enum driveStates {
   STOPPED = 0,
@@ -18,14 +18,14 @@ enum driveStates {
 };
 
 driveStates curDriveState = STOPPED;
-driveStates nextDriveState = (driveStates)((int)STOPPED + 1);
+driveStates nextDriveState = STOPPED;
 driveStates prevDriveState = STOPPED;
 
 void changeState(driveStates nextState) {
   prevDriveState = curDriveState;
   curDriveState = STOPPED;
   nextDriveState = nextState;
-  driveStateTime = millis() + driveStopInterval;
+  driveStateTime = millis();
 }
 
 int cmToEnc(int cm) {
@@ -72,7 +72,7 @@ void driveRightSide(int power) {
 
 void drive(int power) {
   driveLeftSide(power);
-  driveRightSide(power); 
+  driveRightSide(power);
 }
 
 void drive(int leftPower, int rightPower) {
@@ -89,14 +89,45 @@ void stopDrive() {
   changeState(STOPPED);
 }
 
+bool moveStraightTo(int cmTarget) {
+  const double kP = 3.1;
+  const double steerkP = 2;
+  const double accelTime = 400;
+
+  const int target = cmToEnc(cmTarget);
+
+  int distError = target - (ENC_vi32LeftOdometer + ENC_vi32RightOdometer) / 2;
+  int steerError = ENC_vi32LeftOdometer - ENC_vi32RightOdometer;
+  
+  int power;
+  if (millis() < driveStateTime + accelTime)
+    power = map(millis() - driveStateTime, 0, accelTime, 150, driveMaxPower);
+  else
+    power = distError * kP;
+  int steerCorrectPower = steerError * steerkP;
+
+  Serial.printf("Target: %d, Left: %d, Right: %d, St. Error: %d, St. Power: %d, Error: %d, Power: %d\n | %s", target, ENC_vi32LeftOdometer, ENC_vi32RightOdometer, steerError, steerCorrectPower, steerError, power, millis() < driveStateTime + accelTime ? "ACCEL." : "");
+
+  if (distError >= 5)
+    drive(power - steerCorrectPower, power + steerCorrectPower);
+  else
+    return true;
+
+  return false;
+}
+
 void handleDrive() {
-  switch(curDriveState) {
+  switch (curDriveState) {
     case STOPPED:
       drive(0);
-      if (millis() > driveStateTime)
+      if (millis() > driveStateTime + driveStopInterval)
         curDriveState = nextDriveState;
       break;
     case FIRST_FORWARD:
+      if (moveStraightTo(35)) {
+        stopDrive();
+      }
+      drive(255);
       break;
   }
 }
