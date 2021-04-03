@@ -42,19 +42,20 @@
 #define WATCH_VARIABLE_5 ENC_vui16LeftEncoderAMissed
 
 #define WATCH_VARIABLE_6_NAME "ENC_vui16LeftEncoderBMissed"
-#define WATCH_VARIABLE_6_TYPE volatile uint16_t
+#define WATCH_VARIABLE_6_TYPE  volatile uint16_t
 #define WATCH_VARIABLE_6 ENC_vui16LeftEncoderBMissed
 
 #define WATCH_VARIABLE_7_NAME "ENC_vui16RightEncoderAMissed"
-#define WATCH_VARIABLE_7_TYPE volatile uint16_t
+#define WATCH_VARIABLE_7_TYPE  volatile uint16_t
 #define WATCH_VARIABLE_7 ENC_vui16RightEncoderAMissed
 
 #define WATCH_VARIABLE_8_NAME "ENC_vui16RightEncoderBMissed"
-#define WATCH_VARIABLE_8_TYPE volatile uint16_t
+#define WATCH_VARIABLE_8_TYPE  volatile uint16_t
 #define WATCH_VARIABLE_8 ENC_vui16RightEncoderBMissed
 
 ////-----------------------------------------------------------
 ////Row 3
+
 
 #define WATCH_VARIABLE_9_NAME "ENC_ui32LeftEncoderAveTime;LL1;8000;UL1;400000" //only 6 charting varable allowed, first number is minimun value ; 2nd is maximum value
 #define WATCH_VARIABLE_9_TYPE uint32_t
@@ -110,72 +111,74 @@
 //#define WATCH_VARIABLE_20_TYPE float
 //#define WATCH_VARIABLE_20 fTestCounter
 
+
 #include "MyWEBserver.h"
 
 //temporary variable for local variable watching
 unsigned int BP_uiTempVariable1;
 
 //extern variable you what to watch except locals
-#ifdef WATCH_VARIABLE_1
+#ifdef  WATCH_VARIABLE_1
 extern WATCH_VARIABLE_1_TYPE WATCH_VARIABLE_1;
 #endif
-#ifdef WATCH_VARIABLE_2
+#ifdef  WATCH_VARIABLE_2
 extern WATCH_VARIABLE_2_TYPE WATCH_VARIABLE_2;
 #endif
-#ifdef WATCH_VARIABLE_3
+#ifdef  WATCH_VARIABLE_3
 extern WATCH_VARIABLE_3_TYPE WATCH_VARIABLE_3;
 #endif
-#ifdef WATCH_VARIABLE_4
+#ifdef  WATCH_VARIABLE_4
 extern WATCH_VARIABLE_4_TYPE WATCH_VARIABLE_4;
 #endif
-#ifdef WATCH_VARIABLE_5
+#ifdef  WATCH_VARIABLE_5
 extern WATCH_VARIABLE_5_TYPE WATCH_VARIABLE_5;
 #endif
-#ifdef WATCH_VARIABLE_6
+#ifdef  WATCH_VARIABLE_6
 extern WATCH_VARIABLE_6_TYPE WATCH_VARIABLE_6;
 #endif
-#ifdef WATCH_VARIABLE_7
+#ifdef  WATCH_VARIABLE_7
 extern WATCH_VARIABLE_7_TYPE WATCH_VARIABLE_7;
 #endif
-#ifdef WATCH_VARIABLE_8
+#ifdef  WATCH_VARIABLE_8
 extern WATCH_VARIABLE_8_TYPE WATCH_VARIABLE_8;
 #endif
-#ifdef WATCH_VARIABLE_9
+#ifdef  WATCH_VARIABLE_9
 extern WATCH_VARIABLE_9_TYPE WATCH_VARIABLE_9;
 #endif
-#ifdef WATCH_VARIABLE_10
+#ifdef  WATCH_VARIABLE_10
 extern WATCH_VARIABLE_10_TYPE WATCH_VARIABLE_10;
 #endif
-#ifdef WATCH_VARIABLE_11
+#ifdef  WATCH_VARIABLE_11
 extern WATCH_VARIABLE_11_TYPE WATCH_VARIABLE_11;
 #endif
-#ifdef WATCH_VARIABLE_12
+#ifdef  WATCH_VARIABLE_12
 extern WATCH_VARIABLE_12_TYPE WATCH_VARIABLE_12;
 #endif
-#ifdef WATCH_VARIABLE_13
+#ifdef  WATCH_VARIABLE_13
 extern WATCH_VARIABLE_13_TYPE WATCH_VARIABLE_13;
 #endif
-#ifdef WATCH_VARIABLE_14
+#ifdef  WATCH_VARIABLE_14
 extern WATCH_VARIABLE_14_TYPE WATCH_VARIABLE_14;
 #endif
-#ifdef WATCH_VARIABLE_15
+#ifdef  WATCH_VARIABLE_15
 extern WATCH_VARIABLE_15_TYPE WATCH_VARIABLE_15;
 #endif
-#ifdef WATCH_VARIABLE_16
+#ifdef  WATCH_VARIABLE_16
 extern WATCH_VARIABLE_16_TYPE WATCH_VARIABLE_16;
 #endif
-#ifdef WATCH_VARIABLE_17
+#ifdef  WATCH_VARIABLE_17
 extern WATCH_VARIABLE_17_TYPE WATCH_VARIABLE_17;
 #endif
-#ifdef WATCH_VARIABLE_18
+#ifdef  WATCH_VARIABLE_18
 extern WATCH_VARIABLE_18_TYPE WATCH_VARIABLE_18;
 #endif
-#ifdef WATCH_VARIABLE_19
+#ifdef  WATCH_VARIABLE_19
 extern WATCH_VARIABLE_19_TYPE WATCH_VARIABLE_19;
 #endif
-#ifdef WATCH_VARIABLE_20
+#ifdef  WATCH_VARIABLE_20
 extern WATCH_VARIABLE_20_TYPE WATCH_VARIABLE_20;
 #endif
+
 
 void WSVR_BreakPointInit(String strDebug_OnOff, String strHaltContinous)
 {
@@ -186,6 +189,7 @@ void WSVR_BreakPointInit(String strDebug_OnOff, String strHaltContinous)
   //BPCN;NN;LL1;variable 1 lower limit,UU1; variable 1 upper limit;LL2;variable 2 lower limit,UU2; variable 2 upper limit;+
   //LL3;variable 3 lower limit,UU3; variable 3 upper limit;LL4;variable 4 lower limit,UU4; variable 4 upper limit;LL5;variable 5 lower limit,UU5; variable 5 upper limit;+
   //variable name1;...variable name 6;
+
 
   if (strDebug_OnOff.equals("DBON"))
   {
@@ -268,6 +272,7 @@ void WSVR_BreakPointInit(String strDebug_OnOff, String strHaltContinous)
                           + String("WV20") + ";" + String(WATCH_VARIABLE_20_NAME) + ";"
 #endif
                           + String("END");
+
 }
 
 void WSVR_BreakPoint(unsigned char ucBPindex)
@@ -344,7 +349,7 @@ void WSVR_BreakPoint(unsigned char ucBPindex)
     {
       bWSVR_Halted = true;
 
-      if ((ucBPindex != 0) && (ucBPindex < 5))
+      if ((ucBPindex != 0)  && (ucBPindex < 5))
       {
         strWSVR_VariableData.setCharAt(4, 'H');
         strWSVR_VariableData.setCharAt(5, (0x30 + ucBPindex));
@@ -361,14 +366,30 @@ void WSVR_BreakPoint(unsigned char ucBPindex)
         }
       }
 
+
       strWSVR_VariableData.setCharAt(4, 'C');
       strWSVR_VariableData.setCharAt(5, 'C');
+
     }
     else
     {
       WSVR_SendMsg(strWSVR_VariableData);
+
     }
+
+
   }
+
 }
+
+
+
+
+
+
+
+
+
+
 
 #endif

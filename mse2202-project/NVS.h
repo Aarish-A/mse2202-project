@@ -24,13 +24,16 @@
 #define NVS_CRC_2 2
 #define NVS_Footer 3
 
+
+
 unsigned char NVS_Reverse(unsigned char crc);
 
-EEPROMClass NVS_CRCArea("eeprom0", 4);
-EEPROMClass NVS_Area1("eeprom1", NVS_EEPROM_SIZE);
-EEPROMClass NVS_Area2("eeprom2", NVS_EEPROM_SIZE);
+EEPROMClass  NVS_CRCArea("eeprom0", 4);
+EEPROMClass  NVS_Area1("eeprom1", NVS_EEPROM_SIZE);
+EEPROMClass  NVS_Area2("eeprom2", NVS_EEPROM_SIZE);
 
 boolean NVS_btEEpromArea1_2 = 0; //0 = area 1 ; 1 = area 2
+
 
 unsigned char NVS_ucTempRead;
 unsigned int NVS_uiCRC_1;
@@ -76,6 +79,7 @@ unsigned char NVS_Init()
     // if good then set RTC memory
     // not set up then start fresh
     //if corrupt then error message
+
 
     // check CRC for eeprom area 1 is = eeprom area 2
     NVS_uiCRC_1 = NVS_CRCArea.readByte(NVS_CRC_1);
@@ -175,6 +179,7 @@ unsigned char NVS_Init()
         Serial.print(" eeprom area 2, ");
       }
       Serial.println("");
+
     }
     if (NVS_ui_Error & 0x08)
     {
@@ -240,7 +245,7 @@ uint8_t NVS_ReadUChar(unsigned int uiAddress) //one byte
   }
 }
 
-uint16_t NVS_ReadUInt(unsigned int uiAddress) //2 byte
+uint16_t NVS_ReadUInt(unsigned  int uiAddress)//2 byte
 {
   if (NVS_btEEpromArea1_2)
   {
@@ -252,7 +257,7 @@ uint16_t NVS_ReadUInt(unsigned int uiAddress) //2 byte
   }
 }
 
-uint32_t NVS_ReadULong(unsigned int uiAddress) //4 bytes
+uint32_t NVS_ReadULong(unsigned  int uiAddress)//4 bytes
 {
   if (NVS_btEEpromArea1_2)
   {
@@ -264,7 +269,7 @@ uint32_t NVS_ReadULong(unsigned int uiAddress) //4 bytes
   }
 }
 
-int32_t NVS_ReadLong(unsigned int uiAddress) //4 bytes
+int32_t NVS_ReadLong(unsigned  int uiAddress)//4 bytes
 {
   if (NVS_btEEpromArea1_2)
   {
@@ -276,7 +281,7 @@ int32_t NVS_ReadLong(unsigned int uiAddress) //4 bytes
   }
 }
 
-double_t NVS_ReadDouble(unsigned int uiAddress) //8 bytes
+double_t NVS_ReadDouble(unsigned  int uiAddress)//8 bytes
 {
   if (NVS_btEEpromArea1_2)
   {
@@ -288,7 +293,7 @@ double_t NVS_ReadDouble(unsigned int uiAddress) //8 bytes
   }
 }
 
-void NVS_StoreUChar(unsigned int uiAddress, uint8_t ucData)
+void NVS_StoreUChar(unsigned  int uiAddress, uint8_t ucData)
 {
   Serial.println();
   Serial.print(" d = ");
@@ -299,25 +304,32 @@ void NVS_StoreUChar(unsigned int uiAddress, uint8_t ucData)
   NVS_Area1.writeUChar(uiAddress, ucData);
 }
 
-void NVS_StoreUInt(unsigned int uiAddress, uint16_t uiData)
+void NVS_StoreUInt(unsigned  int uiAddress, uint16_t uiData)
 {
+
   NVS_Area1.writeUShort(uiAddress, uiData);
 }
 
-void NVS_StoreULong(unsigned int uiAddress, uint32_t ulData)
+void NVS_StoreULong(unsigned  int uiAddress, uint32_t ulData)
 {
+
   NVS_Area1.writeULong(uiAddress, ulData);
 }
 
-void NVS_StoreLong(unsigned int uiAddress, int32_t lData)
+void NVS_StoreLong(unsigned  int uiAddress, int32_t lData)
 {
+
   NVS_Area1.writeLong(uiAddress, lData);
 }
 
-void NVS_StoreDouble(unsigned int uiAddress, double_t dData)
+void NVS_StoreDouble(unsigned  int uiAddress, double_t dData)
 {
+
   NVS_Area1.writeDouble(uiAddress, dData);
+
 }
+
+
 
 //Commit Area 1 when the unit is when put to sleep/Shutdown
 //does a RAID commit
@@ -335,11 +347,12 @@ void NVS_Commit()
   NVS_Area2.commit();
   NVS_CRCArea.writeByte(NVS_Header, NVS_HEADER);
   NVS_CRCArea.writeByte(NVS_CRC_1, NVS_uiCRC_Temp);
-  NVS_uiCRC_Temp = NVS_Reverse(NVS_uiCRC_Temp);
+  NVS_uiCRC_Temp =  NVS_Reverse(NVS_uiCRC_Temp);
   NVS_uiCRC_Temp = ~NVS_uiCRC_Temp + 1;
   NVS_CRCArea.writeByte(NVS_CRC_2, NVS_uiCRC_Temp);
   NVS_CRCArea.writeByte(NVS_Footer, NVS_FOOTER);
   NVS_CRCArea.commit();
+
 }
 
 unsigned char NVS_Reverse(unsigned char crc)
@@ -349,5 +362,6 @@ unsigned char NVS_Reverse(unsigned char crc)
   crc = (crc & 0xAA) >> 1 | (crc & 0x55) << 1;
   return crc;
 }
+
 
 #endif

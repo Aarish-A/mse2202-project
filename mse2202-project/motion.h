@@ -3,6 +3,7 @@
   2020 05 13 E J Porter
 
   Dual Motor driver controller implement
+
 */
 
 #ifndef MOTION_H
@@ -12,6 +13,8 @@
 
 #define DEBUGPRINT 1
 #define ACCELERATIONRATE 1;
+
+
 
 unsigned char ucMotion_Direction;
 unsigned char ucMotion_Speed;
@@ -29,11 +32,11 @@ double dReverseSpeed;
 double dLeftSpeed;
 double dRightSpeed;
 
-void setupMotion(void)
+void setupMotion (void)
 {
 
   dManualSpeed = 0;
-  dForwardSpeed = 250; // max 255; min ~150 before motor stall
+  dForwardSpeed = 250;  // max 255; min ~150 before motor stall
   dReverseSpeed = 250;
   dLeftSpeed = 170;
   dRightSpeed = 170;
@@ -56,31 +59,44 @@ void setupMotion(void)
   ucMotion_Speed = 0;
 }
 
+
 void ResetSpeeds()
 {
   ui8LeftWorkingSpeed = cui8StartingSpeed;
   ui8RightWorkingSpeed = cui8StartingSpeed;
+
+
 }
 
 void MoveTo(uint8_t ui8Direction, uint8_t ui8LeftSpeed, uint8_t ui8RightSpeed)
 {
-  int iPrintOnce;
+  int  iPrintOnce;
+
 
   switch (ui8Direction)
   {
+
+
     //forward
     case 1:
       {
 
         if (ui8LeftWorkingSpeed >= ui8LeftSpeed)
+        {
           ui8LeftWorkingSpeed = ui8LeftSpeed;
+        }
         else
+        {
           ui8LeftWorkingSpeed = ui8LeftWorkingSpeed + ACCELERATIONRATE;
-
+        }
         if (ui8RightWorkingSpeed >= ui8RightSpeed)
+        {
           ui8RightWorkingSpeed = ui8RightSpeed;
+        }
         else
+        {
           ui8RightWorkingSpeed = ui8RightWorkingSpeed + ACCELERATIONRATE;
+        }
 
         ledcWrite(2, 0);
         ledcWrite(1, ui8LeftWorkingSpeed);
@@ -93,14 +109,21 @@ void MoveTo(uint8_t ui8Direction, uint8_t ui8LeftSpeed, uint8_t ui8RightSpeed)
     case 2:
       {
         if (ui8LeftWorkingSpeed >= ui8LeftSpeed)
+        {
           ui8LeftWorkingSpeed = ui8LeftSpeed;
+        }
         else
+        {
           ui8LeftWorkingSpeed = ui8LeftWorkingSpeed + ACCELERATIONRATE;
-
+        }
         if (ui8RightWorkingSpeed >= ui8RightSpeed)
+        {
           ui8RightWorkingSpeed = ui8RightSpeed;
+        }
         else
+        {
           ui8RightWorkingSpeed = ui8RightWorkingSpeed + ACCELERATIONRATE;
+        }
 
         ledcWrite(1, 0);
         ledcWrite(2, ui8LeftWorkingSpeed);
@@ -113,14 +136,21 @@ void MoveTo(uint8_t ui8Direction, uint8_t ui8LeftSpeed, uint8_t ui8RightSpeed)
     case 3:
       {
         if (ui8LeftWorkingSpeed >= ui8LeftSpeed)
+        {
           ui8LeftWorkingSpeed = ui8LeftSpeed;
+        }
         else
+        {
           ui8LeftWorkingSpeed = ui8LeftWorkingSpeed + ACCELERATIONRATE;
-
+        }
         if (ui8RightWorkingSpeed >= ui8RightSpeed)
+        {
           ui8RightWorkingSpeed = ui8RightSpeed;
+        }
         else
+        {
           ui8RightWorkingSpeed = ui8RightWorkingSpeed + ACCELERATIONRATE;
+        }
 
         ledcWrite(2, 0);
         ledcWrite(1, ui8LeftWorkingSpeed);
@@ -134,14 +164,21 @@ void MoveTo(uint8_t ui8Direction, uint8_t ui8LeftSpeed, uint8_t ui8RightSpeed)
       {
 
         if (ui8LeftWorkingSpeed >= ui8LeftSpeed)
+        {
           ui8LeftWorkingSpeed = ui8LeftSpeed;
+        }
         else
+        {
           ui8LeftWorkingSpeed = ui8LeftWorkingSpeed + ACCELERATIONRATE;
-
+        }
         if (ui8RightWorkingSpeed >= ui8RightSpeed)
+        {
           ui8RightWorkingSpeed = ui8RightSpeed;
+        }
         else
+        {
           ui8RightWorkingSpeed = ui8RightWorkingSpeed + ACCELERATIONRATE;
+        }
 
         ledcWrite(1, 0);
         ledcWrite(2, ui8LeftWorkingSpeed);
@@ -150,12 +187,14 @@ void MoveTo(uint8_t ui8Direction, uint8_t ui8LeftSpeed, uint8_t ui8RightSpeed)
 
         break;
       }
+
+
   }
 }
 
 void move(uint8_t ui8Speed)
 {
-  int iPrintOnce;
+  int  iPrintOnce;
 
   switch (ucMotorState)
   {

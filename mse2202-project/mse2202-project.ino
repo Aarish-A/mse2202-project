@@ -57,13 +57,13 @@ const int ciEncoderRightB = 13;
 
 #include <Adafruit_NeoPixel.h>
 #include <Math.h>
-#include "Motion.h";
+//#include "Motion.h";
+#include "drive.h"
 #include "MyWEBserver.h"
 #include "BreakPoint.h"
 #include "WDT.h";
 
 const int CR1_ciMainTimer = 1000;
-const int CR1_ciMotorRunTime = 1000;
 const long CR1_clDebounceDelay = 50;
 
 const uint8_t ci8RightTurn = 18;
@@ -82,12 +82,11 @@ unsigned long CR1_ulMainTimerNow;
 
 unsigned long CR1_ulMotorTimerPrevious;
 unsigned long CR1_ulMotorTimerNow;
-unsigned char ucMotorStateIndex = 0;
 
-boolean btRun = false;
+boolean start = false;
 boolean btToggle = true;
-int iButtonState;
-int iLastButtonState = HIGH;
+int curButtonState;
+int prevButtonState = HIGH;
 
 void setup()
 {
@@ -102,49 +101,18 @@ void setup()
 
 void loop()
 {
+  curButtonState = digitalRead(ciPB1);
+  
   ENC_Averaging(); //average the encoder tick times
 
-  int iButtonValue = digitalRead(ciPB1); // read value of push button 1
-  if (iButtonValue != iLastButtonState)
-  { // if value has changed
-    CR1_ulLastDebounceTime = millis(); // reset the debouncing timer
+  if (curButtonState == LOW && prevButtonState == HIGH) {
+    start = !start;
+    if (start)
+      startDrive();
+    else
+      stopDrive();
   }
-
-  Serial.printf("Left: %d, Right: %d\n", ENC_vi32LeftOdometer, ENC_vi32RightOdometer);
-
-  if ((millis() - CR1_ulLastDebounceTime) > CR1_clDebounceDelay)
-  {
-    if (iButtonValue != iButtonState)
-    { // if the button state has changed
-      iButtonState = iButtonValue; // update current button state
-
-      // only toggle the run condition if the new button state is LOW
-      if (iButtonState == LOW)
-      {
-        ENC_ClearLeftOdometer();
-        ENC_ClearRightOdometer();
-        btRun = !btRun;
-        Serial.println(btRun);
-
-        // if stopping, reset motor states and stop motors
-        if (!btRun)
-        {
-          ucMotorStateIndex = 0;
-          ucMotorState = 0;
-          move(0);
-        }
-      }
-    }
-  }
-  iLastButtonState = iButtonValue; // store button state
-
-  if (!digitalRead(ciLimitSwitch))
-  {
-    btRun = 0; //if limit switch is pressed stop bot
-    ucMotorStateIndex = 0;
-    ucMotorState = 0;
-    move(0);
-  }
+    
 
   CR1_ulMainTimerNow = micros();
   if (CR1_ulMainTimerNow - CR1_ulMainTimerPrevious >= CR1_ciMainTimer)
@@ -158,59 +126,7 @@ void loop()
     { //full switch run through is 1mS
       case 0:
         {
-          if (btRun)
-          {
-            CR1_ulMotorTimerNow = millis();
-            if (CR1_ulMotorTimerNow - CR1_ulMotorTimerPrevious >= CR1_ciMotorRunTime)
-            {
-              CR1_ulMotorTimerPrevious = CR1_ulMotorTimerNow;
-              switch (ucMotorStateIndex)
-              {
-                case 0:
-                  {
-                    ucMotorStateIndex = 1;
-                    ucMotorState = 0;
-                    move(0);
-                    break;
-                  }
-                case 1:
-                  {
-
-                    ENC_SetDistance(200, 200);
-                    ucMotorState = 1; //forward
-                    CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
-                    CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
-                    ucMotorStateIndex = 2;
-
-                    break;
-                  }
-                case 2:
-                  {
-                    ucMotorStateIndex = 3;
-                    ucMotorState = 0;
-                    move(0);
-                    break;
-                  }
-                case 3:
-                  {
-                    ENC_SetDistance(-(ci8LeftTurn), ci8LeftTurn);
-                    CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
-                    CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
-                    ucMotorStateIndex = 4;
-                    ucMotorState = 2; //left
-
-                    break;
-                  }
-                case 4:
-                  {
-                    ucMotorStateIndex = 5;
-                    ucMotorState = 0;
-                    move(0);
-                    break;
-                  }
-              }
-            }
-          }
+          handleDrive();
           CR1_ucMainTimerCaseCore1 = 1;
           break;
         }
@@ -234,12 +150,6 @@ void loop()
       //###############################################################################
       case 3:
         {
-          //move bot X number of odometer ticks
-          if (ENC_ISMotorRunning())
-          {
-            MoveTo(ucMotorState, CR1_ui8LeftWheelSpeed, CR1_ui8LeftWheelSpeed);
-          }
-
           CR1_ucMainTimerCaseCore1 = 4;
           break;
         }
@@ -258,10 +168,12 @@ void loop()
       //###############################################################################
       case 6:
         {
-          CR1_ucMainTimerCaseCore1 = 1;
+          CR1_ucMainTimerCaseCore1 = 0;
           break;
         }
         //###############################################################################
     }
   }
+
+  prevButtonState = curButtonState;
 }
