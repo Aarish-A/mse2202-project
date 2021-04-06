@@ -41,6 +41,7 @@
 const int ciPB1 = 27;
 const int ciPot1 = A4; //GPIO 32  - when JP2 has jumper installed Analog pin AD4 is connected to Poteniometer R1
 const int ciLimitSwitch = 26;
+const int ciCurrentSensor = A5;
 
 const int ciMotorLeftA = 4;
 const int ciMotorLeftB = 18;
@@ -95,8 +96,9 @@ void setup()
   Core_ZEROInit();
   Core_ONEInit();
 
-  setupMotion();
+  setupDrive();
   pinMode(ciPB1, INPUT_PULLUP);
+  pinMode(ciCurrentSensor, INPUT); // Current sensor
 }
 
 void loop()
@@ -109,13 +111,9 @@ void loop()
 
   if (curButtonState == LOW && prevButtonState == HIGH) {
     start = !start;
-    if (start)
-      startDrive();
-    else
-      stopDrive();
+    toggleDrive();
   }
-
-
+  
   handleDrive();
   delay(1);
 

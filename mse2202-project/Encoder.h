@@ -10,7 +10,7 @@
 
 //---------------------------------------------------------------------------
 
-#include "Motion.h";
+//#include "Motion.h";
 
 
 
@@ -76,18 +76,6 @@ boolean ENC_ISMotorRunning()
   {
     return (0);
   }
-}
-
-void ENC_SetDistance(int32_t i32LeftDistance, int32_t i32RightDistance)
-{
-
-  ENC_vi32LeftOdometerCompare = ENC_vi32LeftOdometer + i32LeftDistance;
-  ENC_vi32RightOdometerCompare = ENC_vi32RightOdometer + i32RightDistance;
-  ENC_btLeftMotorRunningFlag = true;
-  ENC_btRightMotorRunningFlag = true;
-  ui8LeftWorkingSpeed = cui8StartingSpeed;
-  ui8RightWorkingSpeed = cui8StartingSpeed;
-
 }
 
 //Encoder interrupt service routines - entered every change in in encoder pin H-> L and L ->H
