@@ -15,12 +15,14 @@ struct driveManeuver {
 
 // Navigation Route
 const driveManeuver driveManeuvers[] = {
-  //  {DRIVE, 30},
+  {DRIVE, 30},
   {TURN, 90}
-  //  {DRIVE, 30},
-  //  {TURN, enc90turn},
-  //  {DRIVE, 25}
+  {DRIVE, 30},
+  {TURN, 90},
+  {DRIVE, 25}
 };
+
+const bool cwNavigation = true;
 
 // Robot Constants
 const double wheelDiameter = 4.3;
@@ -41,7 +43,6 @@ const double driveSteerkP = 3.9;
 const double driveAccelTime = 700;
 
 // Turn Tuning Constants
-const bool cwNavigation = true;
 const double turnkP = 2.5;
 const double turnkI = 0.15;
 const double turnAccelTime = 400;
