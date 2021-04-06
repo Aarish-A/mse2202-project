@@ -218,7 +218,7 @@ void handleDrive() {
         changeState(BRAKE);
       break;
     case TURN:
-      if (turnTo(90, cwNavigation))
+      if (turnTo(driveManeuvers[driveManeuverIndex].target, cwNavigation))
         changeState(BRAKE);
       break;
     case BRAKE:
