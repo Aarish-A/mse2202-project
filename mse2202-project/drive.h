@@ -120,7 +120,7 @@ void toggleDrive() {
   }
 }
 
-bool moveStraightTo(int cmTarget) {
+bool driveTo(int cmTarget) {
   target = cmToEnc(cmTarget);
   int& distError = error1;
   int& steerError = error2;
@@ -157,23 +157,38 @@ bool moveStraightTo(int cmTarget) {
   return false;
 }
 
-bool turnTo(int _target, bool cw) {
-  const double kP = 8.5;
-  const double kI = 0.15;
-  const double accelTime = 400;
+bool turnTo(int degTarget, bool cw) {
+  target = degTurnToEnc(degTarget);
 
-  //const int target = _target;
+  int& distEerror = error1;
+  int& wheelError = error2;
 
-  int error = target - ((abs(ENC_vi32LeftOdometer) + abs(ENC_vi32RightOdometer)) / 2);
-  int leftPower = (error * kP + kI) * (cw ? -1 : 1);
-  int rightPower = (error * kP + kI) * (cw ? 1 : -1);
+  distEerror = target - ((abs(ENC_vi32LeftOdometer) + abs(ENC_vi32RightOdometer)) / 2);
+  wheelError = abs(ENC_vi32LeftOdometer) - abs(ENC_vi32RightOdometer);
 
-  if (error >= 5)
+  int& leftPower = power1;
+  int& rightPower = power2;
+  int& p = proportional1;
+  proportional2 = 0;
+  double& turnIntegral = integral;
+  int i = cwNavigation ? -1 : 1;
+
+  if (millis() < driveStateTime + driveAccelTime) {
+    p = 0;
+    leftPower = map(millis() - driveStateTime, 0, driveAccelTime, 0, driveMaxPower) * i;
+    rightPower = map(millis() - driveStateTime, 0, driveAccelTime, 0, driveMaxPower) * -i;
+  } else {
+    p = distEerror * turnkP;
+    leftPower = (p + turnIntegral) * i;
+    rightPower = (p + turnIntegral) * -i;
+  }
+  
+  if (distEerror >= 2)
     drive(leftPower, rightPower);
   else
     return true;
 
-  integral += kI;
+  turnIntegral += turnkI;
   return false;
 }
 
@@ -199,11 +214,11 @@ void handleDrive() {
       drive(power1);
       break;
     case DRIVE:
-      if (moveStraightTo(driveManeuvers[driveManeuverIndex].target))
+      if (driveTo(driveManeuvers[driveManeuverIndex].target))
         changeState(BRAKE);
       break;
     case TURN:
-      if (turnTo(enc90turn, cwNavigation))
+      if (turnTo(90, cwNavigation))
         changeState(BRAKE);
       break;
     case BRAKE:
@@ -216,7 +231,7 @@ void handleDrive() {
         power2 = power * pow((double)ENC_vi32RightOdometer / ENC_vi32LeftOdometer, 2.2);
         drive(power1, power2);
       } else if (state == TURN) {
-        int i = cwNavigation ? 1 : -1;
+        int i = cwNavigation ? -1 : 1;
         power1 = -brakePower * i;
         power2 = brakePower * i;
         drive(power1, power2);
