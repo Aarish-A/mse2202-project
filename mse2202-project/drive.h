@@ -7,6 +7,7 @@
 // Global Movement Measuring Variables
 const int printTime = 1500;
 
+int target = 0;
 int error1 = 0;
 int error2 = 0;
 int power1 = 0;
@@ -17,26 +18,6 @@ int proportional2 = 0;
 double integral = 0;
 
 // Structures and Enums
-enum driveState {
-  STOP = 0,
-  DRIVE,
-  TURN,
-  BRAKE
-};
-
-struct driveManeuver {
-  driveState state;
-  int target;
-};
-
-const driveManeuver driveManeuvers[] = {
-  {DRIVE, 25},
-//  {TURN, enc90turn},
-//  {DRIVE, 30},
-//  {TURN, enc90turn},
-//  {DRIVE, 25}
-};
-
 const int nDriveManeuvers = sizeof(driveManeuvers) / sizeof(driveManeuver);
 
 // Drive State and Maneuver Management Variables
@@ -47,6 +28,7 @@ unsigned int driveManeuverIndex = 0;
 
 void resetMeasurements() {
   ENC_ClearOdometer();
+  target = 0;
   error1 = 0;
   error2 = 0;
   power1 = 0;
@@ -62,20 +44,20 @@ void changeState(driveState nextState) {
   curDriveState = nextState;
 
   switch (curDriveState) {
-    STOP:
-      Serial.printf("Switched state to STOP, took %lu time", millis() - driveStateTime);
+    case STOP:
+      Serial.printf("Switched state to STOP, took %lu time\n", millis() - driveStateTime);
       driveManeuverIndex = 0;
       break;
-    DRIVE:
-      Serial.printf("Switched state to DRIVE, took %lu time", millis() - driveStateTime);
+    case DRIVE:
+      Serial.printf("Switched state to DRIVE, took %lu time\n", millis() - driveStateTime);
       resetMeasurements();
       break;
-    TURN:
-      Serial.printf("Switched state to TURN, took %lu time", millis() - driveStateTime);
+    case TURN:
+      Serial.printf("Switched state to TURN, took %lu time\n", millis() - driveStateTime);
       resetMeasurements();
       break;
-    BRAKE:
-      Serial.printf("Switched state to BRAKE, took %lu time", millis() - driveStateTime);
+    case BRAKE:
+      Serial.printf("Switched state to BRAKE, took %lu time\n", millis() - driveStateTime);
       break;
   }
 
@@ -139,12 +121,7 @@ void toggleDrive() {
 }
 
 bool moveStraightTo(int cmTarget) {
-//  const double& kP = drivekP;
-//  const double& kI = drivekI;
-//  const double& accelTime = driveAccelTime;
-//  const double& steerkP = driveSteerkP;
-
-  const int target = cmToEnc(cmTarget);
+  target = cmToEnc(cmTarget);
   int& distError = error1;
   int& steerError = error2;
 
@@ -163,15 +140,15 @@ bool moveStraightTo(int cmTarget) {
   } else {
     distP = distError * drivekP;
     power = distP + distIntegral;
-  }  
-  
+  }
+
   steerP = steerError * driveSteerkP;
   steerPower = steerP;
 
   int leftPower = max(0, power + steerPower);
   int rightPower = max(0, power - steerPower);
 
-  if (distError >= 5)
+  if (distError >= 1)
     drive(leftPower, rightPower);
   else
     return true;
@@ -185,7 +162,7 @@ bool turnTo(int _target, bool cw) {
   const double kI = 0.15;
   const double accelTime = 400;
 
-  const int target = _target;
+  //const int target = _target;
 
   int error = target - ((abs(ENC_vi32LeftOdometer) + abs(ENC_vi32RightOdometer)) / 2);
   int leftPower = (error * kP + kI) * (cw ? -1 : 1);
@@ -208,17 +185,21 @@ void handleDrive() {
     if (inMotionAlg) {
       Serial.printf("IN ALG.   | ");
     } else if (printing) {
+      error1 = target - (abs(ENC_vi32LeftOdometer) + abs(ENC_vi32RightOdometer)) / 2;
+      error2 = abs(ENC_vi32LeftOdometer) - abs(ENC_vi32RightOdometer);
       Serial.printf("DONE ALG. | ");
     }
-    Serial.printf("E1: %3d, E2: %3d, P1: %3d, P2: %3d, p1: %3d, p2: %3d, i: %f\n", error1, error2, power1, power2, proportional1, proportional2, integral);
+    Serial.printf("T: %d, E1: %3d, E2: %3d, P1: %3d, P2: %3d, p1: %3d, p2: %3d, i: %f\n", target, error1, error2, power1, power2, proportional1, proportional2, integral);
   }
 
   switch (curDriveState) {
     case STOP:
-      drive(0);
+      power1 = 0;
+      power2 = 0;
+      drive(power1);
       break;
     case DRIVE:
-      if (moveStraightTo(25))
+      if (moveStraightTo(driveManeuvers[driveManeuverIndex].target))
         changeState(BRAKE);
       break;
     case TURN:
@@ -230,10 +211,15 @@ void handleDrive() {
       int target = driveManeuvers[driveManeuverIndex].target;
 
       if (state == DRIVE) {
-        drive(-brakePower * sgn(target));
+        int power = -brakePower * sgn(target);
+        power1 = power * pow((double)ENC_vi32LeftOdometer / ENC_vi32RightOdometer, 2.2);
+        power2 = power * pow((double)ENC_vi32RightOdometer / ENC_vi32LeftOdometer, 2.2);
+        drive(power1, power2);
       } else if (state == TURN) {
         int i = cwNavigation ? 1 : -1;
-        drive(-brakePower * i, brakePower * i);
+        power1 = -brakePower * i;
+        power2 = brakePower * i;
+        drive(power1, power2);
       }
 
       if (millis() > driveStateTime + brakeTime) {
