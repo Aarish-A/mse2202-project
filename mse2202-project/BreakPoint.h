@@ -22,9 +22,9 @@
 #define WATCH_VARIABLE_1_TYPE unsigned int
 #define WATCH_VARIABLE_1 uiTestCounter
 //
-#define WATCH_VARIABLE_2_NAME "CR1_ui8WheelSpeed"
-#define WATCH_VARIABLE_2_TYPE uint8_t
-#define WATCH_VARIABLE_2 CR1_ui8WheelSpeed
+#define WATCH_VARIABLE_2_NAME "Error1"
+#define WATCH_VARIABLE_2_TYPE int
+#define WATCH_VARIABLE_2 error1
 ////
 #define WATCH_VARIABLE_3_NAME "ENC_vi32RightOdometer"
 #define WATCH_VARIABLE_3_TYPE volatile int32_t

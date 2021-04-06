@@ -54,43 +54,17 @@ const int ciEncoderRightB = 13;
 
 #include "0_Core_Zero.h"
 
-#include <esp_task_wdt.h>
-
-#include <Adafruit_NeoPixel.h>
-#include <Math.h>
-//#include "Motion.h";
 #include "drive.h"
 #include "MyWEBserver.h"
 #include "BreakPoint.h"
 #include "WDT.h";
-
-const int CR1_ciMainTimer = 1000;
-const long CR1_clDebounceDelay = 50;
-
-const uint8_t ci8RightTurn = 18;
-const uint8_t ci8LeftTurn = 17;
-
-unsigned char CR1_ucMainTimerCaseCore1;
-
-uint8_t CR1_ui8WheelSpeed;
-uint8_t CR1_ui8LeftWheelSpeed;
-uint8_t CR1_ui8RightWheelSpeed;
-
-unsigned long CR1_ulLastDebounceTime;
-
-unsigned long CR1_ulMainTimerPrevious;
-unsigned long CR1_ulMainTimerNow;
-
-unsigned long CR1_ulMotorTimerPrevious;
-unsigned long CR1_ulMotorTimerNow;
 
 boolean start = false;
 boolean btToggle = true;
 int curButtonState;
 int prevButtonState = HIGH;
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
 
   Core_ZEROInit();
@@ -101,13 +75,9 @@ void setup()
   pinMode(ciCurrentSensor, INPUT); // Current sensor
 }
 
-void loop()
-{
+void loop() {
   curButtonState = digitalRead(ciPB1);
-
   ENC_Averaging(); //average the encoder tick times
-
-  //  Serial.printf("Left: %d, Right: %d\n", ENC_vi32LeftOdometer, ENC_vi32RightOdometer);
 
   if (curButtonState == LOW && prevButtonState == HIGH) {
     start = !start;
@@ -115,69 +85,7 @@ void loop()
   }
   
   handleDrive();
-  delay(1);
-
-
-//  CR1_ulMainTimerNow = micros();
-//  if (CR1_ulMainTimerNow - CR1_ulMainTimerPrevious >= CR1_ciMainTimer)
-//  {
-//    WDT_ResetCore1();
-//    WDT_ucCaseIndexCore0 = CR0_ucMainTimerCaseCore0;
-//
-//    CR1_ulMainTimerPrevious = CR1_ulMainTimerNow;
-//
-//    switch (CR1_ucMainTimerCaseCore1)
-//    { //full switch run through is 1mS
-//      case 0:
-//        {
-//          handleDrive();
-//          CR1_ucMainTimerCaseCore1 = 1;
-//          break;
-//        }
-//      //###############################################################################
-//      case 1:
-//        {
-//          //read pot 1 for motor speeds
-//          CR1_ui8WheelSpeed = map(analogRead(ciPot1), 0, 4096, 130, 255); // adjust to range that will produce motion
-//
-//          CR1_ucMainTimerCaseCore1 = 2;
-//          break;
-//        }
-//      //###############################################################################
-//      case 2:
-//        {
-//          // asm volatile("esync; rsr %0,ccount":"=a" (vui32test1)); // @ 240mHz clock each tick is ~4nS
-//          //   asm volatile("esync; rsr %0,ccount":"=a" (vui32test2)); // @ 240mHz clock each tick is ~4nS
-//          CR1_ucMainTimerCaseCore1 = 3;
-//          break;
-//        }
-//      //###############################################################################
-//      case 3:
-//        {
-//          CR1_ucMainTimerCaseCore1 = 4;
-//          break;
-//        }
-//      //###############################################################################
-//      case 4:
-//        {
-//          CR1_ucMainTimerCaseCore1 = 5;
-//          break;
-//        }
-//      //###############################################################################
-//      case 5:
-//        {
-//          CR1_ucMainTimerCaseCore1 = 6;
-//          break;
-//        }
-//      //###############################################################################
-//      case 6:
-//        {
-//          CR1_ucMainTimerCaseCore1 = 0;
-//          break;
-//        }
-//        //###############################################################################
-//    }
-//  }
-
+  
   prevButtonState = curButtonState;
+  delay(1);
 }
