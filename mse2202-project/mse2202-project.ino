@@ -80,7 +80,6 @@ void setup() {
 }
 
 void loop() {
-  Serial.printf("built in: %d", LED_BUILTIN);
   curButtonState = digitalRead(ciPB1);
   ENC_Averaging(); //average the encoder tick times
 

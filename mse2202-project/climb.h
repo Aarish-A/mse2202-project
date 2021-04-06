@@ -74,7 +74,7 @@ void startClimb() {
 
 void handleClimb() {
   current = analogRead(ciCurrentSensor);
-  Serial.printf("Current: %d\n", current);
+//  Serial.printf("Current: %d\n", current);
   
   if (current >= currentThreshold) {
     currentChangeTime = 0;
@@ -84,7 +84,7 @@ void handleClimb() {
     currentChangeTime = millis() + currentStallTime;
   } 
   
-  switch (climbStateTime) {
+  switch (curClimbState) {
     case STOPPED:
       climb(0);
       break;
