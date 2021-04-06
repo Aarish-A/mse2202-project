@@ -47,8 +47,8 @@ const int ciMotorLeftA = 4;
 const int ciMotorLeftB = 18;
 const int ciMotorRightA = 19;
 const int ciMotorRightB = 12;
-const int ciMotorClimbA = 15;
-const int ciMotorClimbB = 2;
+const int ciMotorClimbA = 25;
+const int ciMotorClimbB = 23;
 
 const int ciEncoderLeftA = 5;
 const int ciEncoderLeftB = 17;
@@ -80,6 +80,7 @@ void setup() {
 }
 
 void loop() {
+  Serial.printf("built in: %d", LED_BUILTIN);
   curButtonState = digitalRead(ciPB1);
   ENC_Averaging(); //average the encoder tick times
 
@@ -88,12 +89,13 @@ void loop() {
     toggleDrive();
     stopClimb();
   }
-  
+
   handleDrive();
-  if (readyToClimb())
+  if (readyToClimb()) {
     startClimb();
+  }
   handleClimb();
-  
+
   prevButtonState = curButtonState;
-  delay(3);
+  delay(1);
 }

@@ -16,7 +16,7 @@ struct driveManeuver {
 // Navigation Route
 const driveManeuver driveManeuvers[] = {
   {DRIVE, 30},
-//  {TURN, 90},
+  {TURN, 90},
 //  {DRIVE, 30},
 //  {TURN, 90},
 //  {DRIVE, 25}

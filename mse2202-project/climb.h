@@ -19,27 +19,26 @@ unsigned long climbStateTime = 0;
 climbState prevClimbState = STOPPED;
 climbState curClimbState = STOPPED;
 
-void changeState(climbState nextState) {
+void changeClimbState(climbState nextState) {
   prevClimbState = curClimbState;
   curClimbState = nextState;
 
   switch (curClimbState) {
     case STOPPED:
-      Serial.printf("Switched state to STOPPED, took %lu time\n", millis() - driveStateTime);
-      driveManeuverIndex = 0;
+      Serial.printf("Switched state to STOPPED, took %lu time\n", millis() - climbStateTime);
       break;
     case UP:
-      Serial.printf("Switched state to UP, took %lu time\n", millis() - driveStateTime);
+      Serial.printf("Switched state to UP, took %lu time\n", millis() - climbStateTime);
       break;
     case DOWN:
-      Serial.printf("Switched state to DOWN, took %lu time\n", millis() - driveStateTime);
+      Serial.printf("Switched state to DOWN, took %lu time\n", millis() - climbStateTime);
       break;
     case HOLD:
-      Serial.printf("Switched state to HOLD, took %lu time\n", millis() - driveStateTime);
+      Serial.printf("Switched state to HOLD, took %lu time\n", millis() - climbStateTime);
       break;
   }
 
-  driveStateTime = millis();
+  climbStateTime = millis();
 }
 
 void setupClimb() {
@@ -66,11 +65,11 @@ void climb(int power) {
 }
 
 void stopClimb() {
-  changeState(STOPPED);
+  changeClimbState(STOPPED);
 }
 
 void startClimb() {
-  changeState(UP);
+  changeClimbState(UP);
 }
 
 void handleClimb() {
@@ -80,12 +79,12 @@ void handleClimb() {
   if (current >= currentThreshold) {
     currentChangeTime = 0;
   } else if (currentChangeTime != 0 && millis() > currentChangeTime) {
-    changeState(HOLD);
+    changeClimbState(HOLD);
   } else if (currentChangeTime == 0 && current < currentThreshold) {
     currentChangeTime = millis() + currentStallTime;
   } 
   
-  switch (curDriveState) {
+  switch (climbStateTime) {
     case STOPPED:
       climb(0);
       break;
