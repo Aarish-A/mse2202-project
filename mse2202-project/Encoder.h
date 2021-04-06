@@ -10,7 +10,9 @@
 
 //---------------------------------------------------------------------------
 
-#include "Motion.h";
+//#include "Motion.h";
+
+
 
 volatile boolean ENC_btLeftEncoderADataFlag;
 volatile boolean ENC_btLeftEncoderBDataFlag;
@@ -25,12 +27,15 @@ volatile uint16_t ENC_vui16LeftEncoderBMissed;
 volatile uint16_t ENC_vui16RightEncoderAMissed;
 volatile uint16_t ENC_vui16RightEncoderBMissed;
 
+
 uint16_t ENC_uiAlpha = 8196;
 
 volatile int32_t ENC_vi32LeftEncoderARawTime;
 volatile int32_t ENC_vi32LeftEncoderBRawTime;
 volatile int32_t ENC_vi32RightEncoderARawTime;
 volatile int32_t ENC_vi32RightEncoderBRawTime;
+
+
 
 int32_t ENC_ui32LeftEncoderAAveTime;
 int32_t ENC_ui32LeftEncoderBAveTime;
@@ -46,13 +51,19 @@ volatile int32_t ENC_vi32RightOdometer;
 volatile int32_t ENC_vi32LeftOdometerCompare;
 volatile int32_t ENC_vi32RightOdometerCompare;
 
+
 volatile int32_t ENC_vsi32LastTimeLA;
 volatile int32_t ENC_vsi32ThisTimeLA;
 
 void ENC_Calibrate()
 {
 
+
   //asm volatile("esync; rsr %0,ccount":"=a" (ENC_vsi32ThisTime)); // @ 240mHz clock each tick is ~4nS
+
+
+
+
 }
 
 boolean ENC_ISMotorRunning()
@@ -67,17 +78,6 @@ boolean ENC_ISMotorRunning()
   }
 }
 
-void ENC_SetDistance(int32_t i32LeftDistance, int32_t i32RightDistance)
-{
-
-  ENC_vi32LeftOdometerCompare = ENC_vi32LeftOdometer + i32LeftDistance;
-  ENC_vi32RightOdometerCompare = ENC_vi32RightOdometer + i32RightDistance;
-  ENC_btLeftMotorRunningFlag = true;
-  ENC_btRightMotorRunningFlag = true;
-  ui8LeftWorkingSpeed = cui8StartingSpeed;
-  ui8RightWorkingSpeed = cui8StartingSpeed;
-}
-
 //Encoder interrupt service routines - entered every change in in encoder pin H-> L and L ->H
 //---------------------------------------------------------------------------------------------
 void IRAM_ATTR ENC_isrLeftA()
@@ -85,16 +85,17 @@ void IRAM_ATTR ENC_isrLeftA()
   volatile static int32_t ENC_vsi32LastTime;
   volatile static int32_t ENC_vsi32ThisTime;
 
+
   // if the last interrupts data wasn't collected, count the miss
   if (ENC_btLeftEncoderADataFlag)
   {
     ENC_vui16LeftEncoderAMissed += 1;
+
   }
 
   //how much time elapsed since last interrupt
 
-  asm volatile("esync; rsr %0,ccount"
-               : "=a"(ENC_vsi32ThisTime)); // @ 240mHz clock each tick is ~4nS
+  asm volatile("esync; rsr %0,ccount":"=a" (ENC_vsi32ThisTime )); // @ 240mHz clock each tick is ~4nS
   ENC_vi32LeftEncoderARawTime = ENC_vsi32ThisTime - ENC_vsi32LastTime;
   ENC_vsi32LastTime = ENC_vsi32ThisTime;
   ENC_btLeftEncoderADataFlag = true;
@@ -109,6 +110,7 @@ void IRAM_ATTR ENC_isrLeftA()
   {
     ENC_vi32LeftOdometer += 1;
   }
+
 
   if (ENC_btLeftMotorRunningFlag)
   {
@@ -125,7 +127,9 @@ void IRAM_ATTR ENC_isrLeftA()
       ledcWrite(3, 255);
       ledcWrite(4, 255); //stop with braking Right motor
     }
+
   }
+
 }
 
 void IRAM_ATTR ENC_isrLeftB()
@@ -140,8 +144,7 @@ void IRAM_ATTR ENC_isrLeftB()
   }
   //how much time elapsed since last interrupt
   ENC_vsi32LastTime = ENC_vsi32ThisTime;
-  asm volatile("esync; rsr %0,ccount"
-               : "=a"(ENC_vsi32ThisTime)); // @ 240mHz clock each tick is ~4nS
+  asm volatile("esync; rsr %0,ccount":"=a" (ENC_vsi32ThisTime)); // @ 240mHz clock each tick is ~4nS
   ENC_vi32LeftEncoderBRawTime = ENC_vsi32ThisTime - ENC_vsi32LastTime;
   ENC_btLeftEncoderBDataFlag = true;
 
@@ -170,6 +173,7 @@ void IRAM_ATTR ENC_isrLeftB()
       ledcWrite(3, 255);
       ledcWrite(4, 255); //stop with braking Right motor
     }
+
   }
 }
 
@@ -185,8 +189,7 @@ void IRAM_ATTR ENC_isrRightA()
   }
   //how much time elapsed since last interrupt
   ENC_vsi32LastTime = ENC_vsi32ThisTime;
-  asm volatile("esync; rsr %0,ccount"
-               : "=a"(ENC_vsi32ThisTime)); // @ 240mHz clock each tick is ~4nS
+  asm volatile("esync; rsr %0,ccount":"=a" (ENC_vsi32ThisTime)); // @ 240mHz clock each tick is ~4nS
   ENC_vi32RightEncoderARawTime = ENC_vsi32ThisTime - ENC_vsi32LastTime;
   ENC_btRightEncoderADataFlag = true;
 
@@ -215,6 +218,7 @@ void IRAM_ATTR ENC_isrRightA()
       ledcWrite(3, 255);
       ledcWrite(4, 255); //stop with braking Right motor
     }
+
   }
 }
 
@@ -223,6 +227,7 @@ void IRAM_ATTR ENC_isrRightB()
   volatile static int32_t ENC_vsi32LastTime;
   volatile static int32_t ENC_vsi32ThisTime;
 
+
   // if the last interrupts data wasn't collected, count the miss
   if (ENC_btRightEncoderBDataFlag)
   {
@@ -230,8 +235,7 @@ void IRAM_ATTR ENC_isrRightB()
   }
   //how much time elapsed since last interrupt
   ENC_vsi32LastTime = ENC_vsi32ThisTime;
-  asm volatile("esync; rsr %0,ccount"
-               : "=a"(ENC_vsi32ThisTime)); // @ 240mHz clock each tick is ~4nS
+  asm volatile("esync; rsr %0,ccount":"=a" (ENC_vsi32ThisTime)); // @ 240mHz clock each tick is ~4nS
   ENC_vi32RightEncoderBRawTime = ENC_vsi32ThisTime - ENC_vsi32LastTime;
   ENC_btRightEncoderBDataFlag = true;
 
@@ -260,6 +264,7 @@ void IRAM_ATTR ENC_isrRightB()
       ledcWrite(3, 255);
       ledcWrite(4, 255); //stop with braking Right motor
     }
+
   }
 }
 //---------------------------------------------------------------------------------------------
@@ -281,7 +286,10 @@ void ENC_Init()
   ENC_btLeftMotorRunningFlag = false;
   ENC_btRightMotorRunningFlag = false;
 
+
   //check to see if calibration is in eeprom and retreive
+
+
 }
 
 void ENC_Disable()
@@ -292,6 +300,7 @@ void ENC_Disable()
   detachInterrupt(ciEncoderLeftB);
   detachInterrupt(ciEncoderRightA);
   detachInterrupt(ciEncoderRightB);
+
 }
 
 int32_t ENC_Averaging()
@@ -308,7 +317,7 @@ int32_t ENC_Averaging()
 
     ENC_btLeftEncoderADataFlag = false;
 
-    if (ENC_uiAlpha == 65535)
+    if (ENC_uiAlpha == 65535 )
     {
       ENC_ui32LeftEncoderAAveTime = ENC_vi32LeftEncoderARawTime;
     }
@@ -316,6 +325,7 @@ int32_t ENC_Averaging()
     {
       vi64CalutatedAverageTime = (int64_t)ENC_ui32LeftEncoderAAveTime * (65535 - ENC_uiAlpha) + ((int64_t)ENC_vi32LeftEncoderARawTime * ENC_uiAlpha);
       ENC_ui32LeftEncoderAAveTime = (int32_t)((vi64CalutatedAverageTime + 32768) / 65536);
+
     }
     if (ENC_ISMotorRunning())
     {
@@ -328,7 +338,7 @@ int32_t ENC_Averaging()
   {
     ENC_btLeftEncoderBDataFlag = false;
 
-    if (ENC_uiAlpha == 65535)
+    if (ENC_uiAlpha == 65535 )
     {
       ENC_ui32LeftEncoderBAveTime = ENC_vi32LeftEncoderBRawTime;
     }
@@ -336,6 +346,7 @@ int32_t ENC_Averaging()
     {
       vi64CalutatedAverageTime = (int64_t)ENC_ui32LeftEncoderBAveTime * (65535 - ENC_uiAlpha) + ((int64_t)ENC_vi32LeftEncoderBRawTime * ENC_uiAlpha);
       ENC_ui32LeftEncoderBAveTime = (int32_t)((vi64CalutatedAverageTime + 32768) / 65536);
+
     }
     if (ENC_ISMotorRunning())
     {
@@ -343,12 +354,13 @@ int32_t ENC_Averaging()
     }
   }
 
+
   //Right Enoder A
   if (ENC_btRightEncoderADataFlag)
   {
     ENC_btRightEncoderADataFlag = false;
 
-    if (ENC_uiAlpha == 65535)
+    if (ENC_uiAlpha == 65535 )
     {
       ENC_ui32RightEncoderAAveTime = ENC_vi32RightEncoderARawTime;
     }
@@ -356,6 +368,7 @@ int32_t ENC_Averaging()
     {
       vi64CalutatedAverageTime = (int64_t)ENC_ui32RightEncoderAAveTime * (65535 - ENC_uiAlpha) + ((int64_t)ENC_vi32RightEncoderARawTime * ENC_uiAlpha);
       ENC_ui32RightEncoderAAveTime = (int32_t)((vi64CalutatedAverageTime + 32768) / 65536);
+
     }
     if (ENC_ISMotorRunning())
     {
@@ -368,7 +381,7 @@ int32_t ENC_Averaging()
   {
     ENC_btRightEncoderBDataFlag = false;
 
-    if (ENC_uiAlpha == 65535)
+    if (ENC_uiAlpha == 65535 )
     {
       ENC_ui32RightEncoderBAveTime = ENC_vi32RightEncoderBRawTime;
     }
@@ -376,22 +389,36 @@ int32_t ENC_Averaging()
     {
       vi64CalutatedAverageTime = (int64_t)ENC_ui32RightEncoderBAveTime * (65535 - ENC_uiAlpha) + ((int64_t)ENC_vi32RightEncoderBRawTime * ENC_uiAlpha);
       ENC_ui32RightEncoderBAveTime = (int32_t)((vi64CalutatedAverageTime + 32768) / 65536);
+
     }
     if (ENC_ISMotorRunning())
     {
       ENC_ui32RightEncoderAveTime = ((ENC_ui32RightEncoderAAveTime + ENC_ui32RightEncoderBAveTime) * 3) / 1000;
     }
   }
+
+
 }
+
 
 void ENC_ClearLeftOdometer()
 {
   ENC_vi32LeftOdometer = 0;
+
 }
+
 
 void ENC_ClearRightOdometer()
 {
   ENC_vi32RightOdometer = 0;
 }
+
+void ENC_ClearOdometer() {
+  ENC_ClearLeftOdometer();
+  ENC_ClearRightOdometer();
+}
+
+
+
 
 #endif

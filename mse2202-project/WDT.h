@@ -13,60 +13,65 @@
 
 #define ONEHUNDEREDMICROSECONDS 243000
 
+
 unsigned char WDT_ucWatchDogCore0BeenSet;
 unsigned char WDT_ucWatchDogCore1BeenSet;
 
-volatile boolean WDT_vbTiggeredCore0;
-volatile boolean WDT_vbTiggeredCore1;
-volatile boolean WDT_vbTiggeredCore0Msg = false;
-volatile boolean WDT_vbTiggeredCore1Msg = false;
-volatile boolean WDT_vbCore0Running = false;
+volatile boolean  WDT_vbTiggeredCore0;
+volatile boolean  WDT_vbTiggeredCore1;
+volatile boolean  WDT_vbTiggeredCore0Msg = false;
+volatile boolean  WDT_vbTiggeredCore1Msg = false;
+volatile boolean  WDT_vbCore0Running = false;
 
 volatile unsigned char WDT_ucCaseIndexCore0;
 volatile unsigned char WDT_ucCaseIndexCore1;
 
+
+
 volatile uint32_t WDT_vfFastWDTWarningCore0[10];
 volatile uint32_t WDT_vfFastWDTWarningCore1[10];
+
 
 volatile uint32_t WDT_vlPreviousTimeCore0;
 volatile uint32_t WDT_vlNowTimeCore0;
 volatile uint32_t WDT_vlPreviousTimeCore1;
 volatile uint32_t WDT_vlNowTimeCore1;
 
-hw_timer_t *WDT_htTimer0 = NULL;
+
+hw_timer_t * WDT_htTimer0 = NULL;
 portMUX_TYPE WDT_pmtTimerMux0 = portMUX_INITIALIZER_UNLOCKED;
-hw_timer_t *WDT_htTimer1 = NULL;
+hw_timer_t * WDT_htTimer1 = NULL;
 portMUX_TYPE WDT_pmtTimerMux1 = portMUX_INITIALIZER_UNLOCKED;
 
 //---------------------------------------------------------------------------
 
-void IRAM_ATTR WDT_TimeOutCore0()
-{
+void IRAM_ATTR WDT_TimeOutCore0() {
   portENTER_CRITICAL_ISR(&WDT_pmtTimerMux0);
   //add in timing warning
   WDT_vbTiggeredCore0 = true;
   portEXIT_CRITICAL_ISR(&WDT_pmtTimerMux0);
+
 }
 
-void IRAM_ATTR WDT_TimeOutCore1()
-{
+void IRAM_ATTR WDT_TimeOutCore1() {
   portENTER_CRITICAL_ISR(&WDT_pmtTimerMux1);
   //add in timing warning
   WDT_vbTiggeredCore1 = true;
   portEXIT_CRITICAL_ISR(&WDT_pmtTimerMux1);
+
 }
 
 static void WDT_ResetCore0()
 {
   portENTER_CRITICAL(&WDT_pmtTimerMux0);
 
-  asm volatile("esync; rsr %0,ccount"
-               : "=a"(WDT_vlNowTimeCore0)); // @ 240mHz clock each tick is ~4nS
+  asm volatile("esync; rsr %0,ccount":"=a" (WDT_vlNowTimeCore0)); // @ 240mHz clock each tick is ~4nS
   if (WDT_vbTiggeredCore0)
   {
     WDT_vfFastWDTWarningCore0[WDT_ucCaseIndexCore0] = WDT_vlNowTimeCore0 - WDT_vlPreviousTimeCore0;
     WDT_vbTiggeredCore0 = false;
     WDT_vbTiggeredCore0Msg = true;
+
   }
   else
   {
@@ -81,8 +86,7 @@ static void WDT_ResetCore1()
 {
   portENTER_CRITICAL(&WDT_pmtTimerMux1);
 
-  asm volatile("esync; rsr %0,ccount"
-               : "=a"(WDT_vlNowTimeCore1)); // @ 240mHz clock each tick is ~4nS
+  asm volatile("esync; rsr %0,ccount":"=a" (WDT_vlNowTimeCore1)); // @ 240mHz clock each tick is ~4nS
   if (WDT_vbTiggeredCore1)
   {
 
@@ -117,7 +121,9 @@ void WDT_EnableFastWatchDogCore0()
   }
 
   WDT_ResetCore0();
+
 }
+
 
 void WDT_EnableFastWatchDogCore1()
 {
@@ -136,26 +142,9 @@ void WDT_EnableFastWatchDogCore1()
   }
 
   WDT_ResetCore1();
+
 }
 
-void Core_ONEInit()
-{
-  WDT_EnableFastWatchDogCore1();
-  WDT_ResetCore1();
-  WDT_vfFastWDTWarningCore1[0] = 0;
-  WDT_vfFastWDTWarningCore1[1] = 0;
-  WDT_vfFastWDTWarningCore1[2] = 0;
-  WDT_vfFastWDTWarningCore1[3] = 0;
-  WDT_ResetCore1();
-  WDT_vfFastWDTWarningCore1[4] = 0;
-  WDT_vfFastWDTWarningCore1[5] = 0;
-  WDT_vfFastWDTWarningCore1[6] = 0;
-  WDT_vfFastWDTWarningCore1[7] = 0;
-  WDT_ResetCore1();
-  WDT_vfFastWDTWarningCore1[8] = 0;
-  WDT_vfFastWDTWarningCore1[9] = 0;
-  WDT_ResetCore1();
-}
 
 void WDT_CheckOperationTime()
 {
@@ -248,5 +237,25 @@ void WDT_CheckOperationTime()
     }
   }
 }
+
+void Core_ONEInit() {
+  WDT_EnableFastWatchDogCore1();
+  WDT_ResetCore1();
+  WDT_vfFastWDTWarningCore1[0] = 0;
+  WDT_vfFastWDTWarningCore1[1] = 0;
+  WDT_vfFastWDTWarningCore1[2] = 0;
+  WDT_vfFastWDTWarningCore1[3] = 0;
+  WDT_ResetCore1();
+  WDT_vfFastWDTWarningCore1[4] = 0;
+  WDT_vfFastWDTWarningCore1[5] = 0;
+  WDT_vfFastWDTWarningCore1[6] = 0;
+  WDT_vfFastWDTWarningCore1[7] = 0;
+  WDT_ResetCore1();
+  WDT_vfFastWDTWarningCore1[8] = 0;
+  WDT_vfFastWDTWarningCore1[9] = 0;
+  WDT_ResetCore1();
+}
+
+
 
 #endif
