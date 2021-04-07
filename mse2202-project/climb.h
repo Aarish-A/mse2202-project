@@ -2,11 +2,14 @@
 #define CLIMB_H 1
 
 const int holdPower = 0;
+const int upPower = 255;
+const int downPower = 100;
+const long holdTime = 10000;
 
 int current = 0;
 long currentChangeTime = 0;
-const int currentThreshold = 1750;
-const int currentStallTime = 250; 
+const long currentThreshold = 1750;
+const long currentStallTime = 250; 
 
 enum climbState {
   STOPPED = 0,
@@ -89,13 +92,15 @@ void handleClimb() {
       climb(0);
       break;
     case UP:
-      climb(255);
+      climb(upPower);
       break;
     case DOWN:
-      climb(-255);
+      climb(-downPower);
       break;
     case HOLD:
       climb(holdPower);
+      if (millis() > climbStateTime + holdTime)
+        changeClimbState(DOWN);
       break;
   }
 }
