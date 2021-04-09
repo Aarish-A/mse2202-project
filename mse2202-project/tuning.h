@@ -16,10 +16,10 @@ struct driveManeuver {
 // Navigation Route
 const driveManeuver driveManeuvers[] = {
   {DRIVE, 30},
-  {TURN, 90}
-  {DRIVE, 30},
   {TURN, 90},
-  {DRIVE, 25}
+//  {DRIVE, 30},
+//  {TURN, 90},
+//  {DRIVE, 25}
 };
 
 const bool cwNavigation = true;

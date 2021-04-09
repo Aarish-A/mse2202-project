@@ -47,6 +47,9 @@ const int ciMotorLeftA = 4;
 const int ciMotorLeftB = 18;
 const int ciMotorRightA = 19;
 const int ciMotorRightB = 12;
+const int ciMotorClimbA = 25;
+const int ciMotorClimbB = 23;
+
 const int ciEncoderLeftA = 5;
 const int ciEncoderLeftB = 17;
 const int ciEncoderRightA = 14;
@@ -55,6 +58,7 @@ const int ciEncoderRightB = 13;
 #include "0_Core_Zero.h"
 
 #include "drive.h"
+#include "climb.h"
 #include "MyWEBserver.h"
 #include "BreakPoint.h"
 #include "WDT.h";
@@ -71,8 +75,8 @@ void setup() {
   Core_ONEInit();
 
   setupDrive();
+  setupClimb();
   pinMode(ciPB1, INPUT_PULLUP);
-  pinMode(ciCurrentSensor, INPUT); // Current sensor
 }
 
 void loop() {
@@ -82,10 +86,15 @@ void loop() {
   if (curButtonState == LOW && prevButtonState == HIGH) {
     start = !start;
     toggleDrive();
+    stopClimb();
   }
-  
+
   handleDrive();
-  
+  if (readyToClimb()) {
+    startClimb();
+  }
+  handleClimb();
+
   prevButtonState = curButtonState;
   delay(1);
 }

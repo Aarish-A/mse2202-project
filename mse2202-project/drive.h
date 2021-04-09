@@ -120,6 +120,11 @@ void toggleDrive() {
   }
 }
 
+bool readyToClimb() {
+  if (driveManeuverIndex == nDriveManeuvers - 1)
+    return true;
+}
+
 bool driveTo(int cmTarget) {
   target = cmToEnc(cmTarget);
   int& distError = error1;
