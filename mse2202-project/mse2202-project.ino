@@ -37,23 +37,25 @@
   30            VIN                               PWR 5V t 7V                                                                          PWR 5V to 7V
 */
 
-//Pin assignments
+// Sensor Pin assignments
 const int ciPB1 = 27;
-const int ciPot1 = A4; //GPIO 32  - when JP2 has jumper installed Analog pin AD4 is connected to Poteniometer R1
+const int ciPot1 = A4;              //GPIO 32  - when JP2 has jumper installed Analog pin AD4 is connected to Poteniometer R1
 const int ciLimitSwitch = 26;
 const int ciCurrentSensor = A5;
-
-const int ciMotorLeftA = 4;
-const int ciMotorLeftB = 18;
-const int ciMotorRightA = 19;
-const int ciMotorRightB = 12;
-const int ciMotorClimbA = 25;
-const int ciMotorClimbB = 23;
 
 const int ciEncoderLeftA = 5;
 const int ciEncoderLeftB = 17;
 const int ciEncoderRightA = 14;
 const int ciEncoderRightB = 13;
+
+
+// Motor Pin Assignments
+const int ciMotorLeftA = 4;
+const int ciMotorLeftB = 18;
+const int ciMotorRightA = 19;
+const int ciMotorRightB = 12;
+const int ciMotorClimbA = 23;
+const int ciMotorClimbB = 25;
 
 #include "0_Core_Zero.h"
 
@@ -63,7 +65,6 @@ const int ciEncoderRightB = 13;
 #include "BreakPoint.h"
 #include "WDT.h";
 
-boolean start = false;
 boolean btToggle = true;
 int curButtonState;
 int prevButtonState = HIGH;
@@ -74,26 +75,29 @@ void setup() {
   Core_ZEROInit();
   Core_ONEInit();
 
+  // Setup for drive and climb pin modes, LEDC channels
   setupDrive();
   setupClimb();
+  
   pinMode(ciPB1, INPUT_PULLUP);
 }
 
 void loop() {
   curButtonState = digitalRead(ciPB1);
-  ENC_Averaging(); //average the encoder tick times
+  
+  // Average the encoder tick times
+  ENC_Averaging();
 
-  if (curButtonState == LOW && prevButtonState == HIGH) {
-    start = !start;
-    toggleDrive();
-    stopClimb();
+  if (curButtonState == LOW && prevButtonState == HIGH) {   // Rising edge of PB1 press (as soon as it's pressed)
+    toggleDrive();  // Stop the drive if its on, start if its off
+    stopClimb();    // Stop the climb if it's running
   }
 
-  handleDrive();
-  if (readyToClimb()) {
-    startClimb();
+  handleDrive();          // Handle drive state machine (non-blocking)
+  if (readyToClimb()) {   // Determine whether the robot is ready to start climbing (on last drive maneuver)
+    startClimb();         // Switch the climb state to go up
   }
-  handleClimb();
+  handleClimb();          // Handle climb state machine (non-blocking)
 
   prevButtonState = curButtonState;
   delay(1);
